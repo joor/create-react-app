@@ -36,26 +36,35 @@ module.exports = (resolve, rootDir, isEjecting) => {
     setupFilesAfterEnv: setupTestsFile ? [setupTestsFile] : [],
     testMatch: [
       '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
-      '<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}',
+      '<rootDir>/src/**/?(*.){spec,test,stories}.{js,jsx,ts,tsx}', // @joor - the `.` should not be optional
     ],
     testEnvironment: 'jsdom',
-    testRunner: require.resolve('jest-circus/runner'),
+    // @joor - ReferenceError: jasmine is not defined in .storybook/__mocks__/facade.js
+    // testRunner: require.resolve('jest-circus/runner'),
     transform: {
       '^.+\\.(js|jsx|mjs|cjs|ts|tsx)$': isEjecting
         ? '<rootDir>/node_modules/babel-jest'
         : resolve('config/jest/babelTransform.js'),
-      '^.+\\.css$': resolve('config/jest/cssTransform.js'),
-      '^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)': resolve(
+      '^.+\\.(css|less)$': resolve('config/jest/cssTransform.js'),
+      '^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|less|json)$)': resolve(
         'config/jest/fileTransform.js'
       ),
     },
     transformIgnorePatterns: [
-      '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs|cjs|ts|tsx)$',
+      /*
+      This is excluding promise-polyfill.
+      It is included as a dependency of 'flatfile-csv-importer', and it is shipped as an es6 module.
+      In order for the tests to run, it needs to be transformed by babel-jest into the common module format.
+      */
+      '[/\\\\]node_modules[/\\\\](?!promise-polyfill).+\\.(js|jsx)$',
+      // '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs|cjs|ts|tsx)$', // @joor - this breaks some tests
       '^.+\\.module\\.(css|sass|scss)$',
     ],
+    moduleDirectories: ['node_modules', '.storybook'], // @joor
     modulePaths: modules.additionalModulePaths || [],
     moduleNameMapper: {
       '^react-native$': 'react-native-web',
+      '^.+\\.less$': 'identity-obj-proxy',
       '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
       ...(modules.jestAliases || {}),
     },
@@ -66,7 +75,7 @@ module.exports = (resolve, rootDir, isEjecting) => {
       'jest-watch-typeahead/filename',
       'jest-watch-typeahead/testname',
     ],
-    resetMocks: true,
+    resetMocks: false, // @joor - enable
   };
   if (rootDir) {
     config.rootDir = rootDir;
