@@ -818,11 +818,6 @@ module.exports = function (webpackEnv) {
       //     },
       //   },
       // }),
-
-      // @joor Provides the commit hash for use with sentry.
-      new webpack.DefinePlugin({
-        __COMMIT_HASH__: JSON.stringify(process.env.VERSION_ID),
-      }),
     ].filter(Boolean),
     // Some libraries import Node modules but don't use them in the browser.
     // Tell webpack to provide empty mocks for them so importing them works.
