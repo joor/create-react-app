@@ -594,6 +594,12 @@ module.exports = function (webpackEnv) {
                   },
                 },
                 {
+                  loader: require.resolve('less-loader'),
+                  options: {
+                    paths: [paths.appSrc],
+                  },
+                },
+                {
                   loader: require.resolve('postcss-loader'),
                   options: {
                     // Necessary for external CSS imports to work
@@ -608,12 +614,6 @@ module.exports = function (webpackEnv) {
                         stage: 3,
                       }),
                     ],
-                  },
-                },
-                {
-                  loader: require.resolve('less-loader'),
-                  options: {
-                    paths: [paths.appSrc],
                   },
                 },
               ],
