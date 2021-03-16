@@ -583,37 +583,21 @@ module.exports = function (webpackEnv) {
               // @joor
               test: /\.less$/,
               use: [
-                require.resolve('style-loader'),
-                {
-                  loader: require.resolve('css-loader'),
-                  options: {
-                    importLoaders: 1,
-                    modules: {
-                      getLocalIdent: getCSSModuleLocalIdent,
-                    },
+                ...getStyleLoaders({
+                  importLoaders: 1,
+                  sourceMap: isEnvProduction
+                    ? shouldUseSourceMap
+                    : isEnvDevelopment,
+                  modules: {
+                    getLocalIdent: getCSSModuleLocalIdent,
                   },
-                },
-                {
-                  loader: require.resolve('postcss-loader'),
-                  options: {
-                    // Necessary for external CSS imports to work
-                    // https://github.com/facebookincubator/create-react-app/issues/2677
-                    ident: 'postcss',
-                    plugins: () => [
-                      require('postcss-flexbugs-fixes'),
-                      require('postcss-preset-env')({
-                        autoprefixer: {
-                          flexbox: 'no-2009',
-                        },
-                        stage: 3,
-                      }),
-                    ],
-                  },
-                },
+                }),
                 {
                   loader: require.resolve('less-loader'),
                   options: {
-                    paths: [paths.appSrc],
+                    lessOptions: {
+                      paths: [paths.appSrc],
+                    }
                   },
                 },
               ],
